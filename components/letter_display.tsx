@@ -6,7 +6,7 @@ function getRandomSpeed() {
 export function LetterDisplay({ word }: { word: string }) {
   return (
     <>
-      {word.split('').map((char, i) => (
+      {word.split("").map((char, i) => (
         <div
           key={i}
           className="letter text-6xl font-semibold xs:text-[90px] md:text-[120px]"
