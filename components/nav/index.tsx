@@ -6,7 +6,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 left-0 w-full z-50 bg-white backdrop-blur-md border-b border-white/10">
+    <nav className="sticky top-0 left-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-white/10">
       <div className="flex items-center justify-between px-6 py-4">
         <div className="text-xl font-bold tracking-widest text-blue-200">
           subie club
@@ -33,7 +33,7 @@ export default function Navbar() {
         </button>
       </div>
       {open && (
-        <div className="md:hidden flex flex-col items-center gap-6 py-6 bg-black/90 backdrop-blur-md text-sm uppercase tracking-wider">
+        <div className="md:hidden flex flex-col items-center gap-6 py-6 bg-black/40 backdrop-blur-md text-sm uppercase tracking-wider">
           <a href="#home" onClick={() => setOpen(false)}>
             home
           </a>

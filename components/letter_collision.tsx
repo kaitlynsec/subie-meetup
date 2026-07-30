@@ -1,6 +1,12 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { MutableRefObject, useEffect, useRef } from "react";
+import {
+  forwardRef,
+  MutableRefObject,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,18 +26,20 @@ function getRandomRotation() {
 const animateLettersOnScroll = (containerRef: MutableRefObject<any>) => {
   const lettersContainer = containerRef.current;
   const letterElements = lettersContainer?.querySelectorAll(".letter");
+  const maxTravel = lettersContainer?.offsetHeight ?? window.innerHeight;
 
-  letterElements.forEach((letter: Element, index: number) => {
+  letterElements.forEach((letter: Element) => {
     gsap.to(letter, {
-      y: (i, el) =>
-        (1 - parseFloat(el.getAttribute("data-speed"))) *
-        ScrollTrigger.maxScroll(window),
+      y: (i, el) => (1 - parseFloat(el.getAttribute("data-speed"))) * maxTravel,
       ease: "power2.out",
       duration: 0.8,
       scrollTrigger: {
-        trigger: document.documentElement,
-        start: 0,
-        end: window.innerHeight,
+        // Scope the trigger to this component's own container instead of
+        // document.documentElement, so it only animates/exists while this
+        // section is in view.
+        trigger: lettersContainer,
+        start: "top top",
+        end: "bottom top",
         invalidateOnRefresh: true,
         scrub: 0.5,
       },
@@ -52,16 +60,28 @@ function LetterDisplay({ word }: { word: string }) {
   ));
 }
 
-export function LetterCollision() {
-  const containerRef = useRef(null);
+export const LetterCollision = forwardRef<HTMLDivElement>((_, forwardedRef) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(
+    forwardedRef,
+    () => containerRef.current as HTMLDivElement,
+  );
 
   useEffect(() => {
     if (!containerRef.current) return;
-    animateLettersOnScroll(containerRef);
+    const ctx = gsap.context(() => {
+      animateLettersOnScroll(containerRef);
+    }, containerRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <div ref={containerRef} className="ml-8 scroll-smooth">
+    <div
+      ref={containerRef}
+      className="relative ml-8 h-screen overflow-hidden scroll-smooth"
+    >
       <div className="-mt-28 mb-36 flex h-screen flex-col justify-end lg:mb-24">
         <div className="flex flex-wrap p-0">
           <LetterDisplay word={welcome} />
@@ -76,4 +96,5 @@ export function LetterCollision() {
       </div>
     </div>
   );
-}
+});
+LetterCollision.displayName = "LetterCollision";
