@@ -128,7 +128,7 @@ export default function Home() {
       {showScrollButton && (
         <Magnetic>
           <div
-            className="fixed bottom-4 right-8 flex cursor-pointer items-center space-x-2 text-3xl font-semibold sm:bottom-8"
+            className="fixed bottom-4 right-8 flex cursor-pointer items-center space-x-2 text-3xl font-semibold text-white sm:bottom-8"
             onClick={scrollPastIntro}
           >
             <p>Scroll</p>

@@ -22,10 +22,15 @@ function getRandomSpeed() {
 function getRandomRotation() {
   return Math.random() * 60 - 30;
 }
+function getRandomGlow() {
+  const intensity = 6 + Math.random() * 8; // 6-14px
+  return `0 0 4px #A9D6FF, 0 0 ${intensity}px #4A90D9, 0 0 ${intensity * 1.4}px #003478`;
+}
 
 const animateLettersOnScroll = (containerRef: MutableRefObject<any>) => {
   const lettersContainer = containerRef.current;
   const letterElements = lettersContainer?.querySelectorAll(".letter");
+
   const maxTravel = lettersContainer?.offsetHeight ?? window.innerHeight;
 
   letterElements.forEach((letter: Element) => {
@@ -34,12 +39,9 @@ const animateLettersOnScroll = (containerRef: MutableRefObject<any>) => {
       ease: "power2.out",
       duration: 0.8,
       scrollTrigger: {
-        // Scope the trigger to this component's own container instead of
-        // document.documentElement, so it only animates/exists while this
-        // section is in view.
-        trigger: lettersContainer,
-        start: "top top",
-        end: "bottom top",
+        trigger: document.documentElement,
+        start: 0,
+        end: window.innerHeight,
         invalidateOnRefresh: true,
         scrub: 0.5,
       },
@@ -52,7 +54,8 @@ function LetterDisplay({ word }: { word: string }) {
   return word.split("").map((letter, index) => (
     <div
       key={index}
-      className="letter text-6xl font-semibold xs:text-[90px] xs:leading-none md:text-[120px] lg:text-[150px] xl:text-[210px] "
+      className="letter relative text-6xl font-semibold text-[#F5C518] xs:text-[90px] xs:leading-none md:text-[120px] lg:text-[150px] xl:text-[210px]"
+      style={{ textShadow: getRandomGlow() }}
       data-speed={getRandomSpeed()}
     >
       {letter}
@@ -80,9 +83,40 @@ export const LetterCollision = forwardRef<HTMLDivElement>((_, forwardedRef) => {
   return (
     <div
       ref={containerRef}
-      className="relative ml-8 h-screen overflow-hidden scroll-smooth"
+      className="relative h-screen w-full overflow-hidden scroll-smooth bg-[#00102b]"
     >
-      <div className="-mt-28 mb-36 flex h-screen flex-col justify-end lg:mb-24">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 30%, #003478 0%, #00102b 60%, #000814 100%)",
+        }}
+      />
+      <div className="pointer-events-none absolute inset-0 opacity-60">
+        {Array.from({ length: 120 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-white animate-pulse"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 2 + 1}px`,
+              height: `${Math.random() * 2 + 1}px`,
+              animationDuration: `${2 + Math.random() * 3}s`,
+              animationDelay: `${Math.random() * 3}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-48"
+        style={{
+          background: "linear-gradient(to bottom, #00102b, rgba(0,16,43,0))",
+        }}
+      />
+
+      <div className="relative ml-8 -mt-28 mb-36 flex h-screen flex-col justify-end lg:mb-24">
         <div className="flex flex-wrap p-0">
           <LetterDisplay word={welcome} />
           <div className="w-2 xs:w-4 sm:w-10"></div>
