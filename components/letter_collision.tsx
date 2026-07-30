@@ -7,14 +7,14 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-
+ 
 gsap.registerPlugin(ScrollTrigger);
-
+ 
 const welcome = "welcome ";
 const to = "to ";
 const subie = "subie ";
 const club = "club";
-
+ 
 function getRandomSpeed() {
   const randomDecimal = Math.random();
   return 0.8 + randomDecimal * (1.5 - 0.8);
@@ -23,16 +23,20 @@ function getRandomRotation() {
   return Math.random() * 60 - 30;
 }
 function getRandomGlow() {
+  // Subtle old-Subaru star-cluster blue glow.
   const intensity = 6 + Math.random() * 8; // 6-14px
   return `0 0 4px #A9D6FF, 0 0 ${intensity}px #4A90D9, 0 0 ${intensity * 1.4}px #003478`;
 }
-
+ 
 const animateLettersOnScroll = (containerRef: MutableRefObject<any>) => {
   const lettersContainer = containerRef.current;
   const letterElements = lettersContainer?.querySelectorAll(".letter");
-
+ 
+  // Cap travel distance to this container's own height (doesn't bleed into
+  // sections below), but use the document-based trigger, which is the
+  // reliable config that actually animates.
   const maxTravel = lettersContainer?.offsetHeight ?? window.innerHeight;
-
+ 
   letterElements.forEach((letter: Element) => {
     gsap.to(letter, {
       y: (i, el) => (1 - parseFloat(el.getAttribute("data-speed"))) * maxTravel,
@@ -49,12 +53,12 @@ const animateLettersOnScroll = (containerRef: MutableRefObject<any>) => {
     });
   });
 };
-
+ 
 function LetterDisplay({ word }: { word: string }) {
   return word.split("").map((letter, index) => (
     <div
       key={index}
-      className="letter relative text-6xl font-semibold text-[#F5C518] xs:text-[90px] xs:leading-none md:text-[120px] lg:text-[150px] xl:text-[210px]"
+      className="letter relative text-6xl font-semibold text-[#DCEBFF] xs:text-[90px] xs:leading-none md:text-[120px] lg:text-[150px] xl:text-[210px]"
       style={{ textShadow: getRandomGlow() }}
       data-speed={getRandomSpeed()}
     >
@@ -62,25 +66,26 @@ function LetterDisplay({ word }: { word: string }) {
     </div>
   ));
 }
-
+ 
 export const LetterCollision = forwardRef<HTMLDivElement>((_, forwardedRef) => {
   const containerRef = useRef<HTMLDivElement>(null);
-
+ 
   useImperativeHandle(
     forwardedRef,
     () => containerRef.current as HTMLDivElement,
   );
-
+ 
   useEffect(() => {
     if (!containerRef.current) return;
     const ctx = gsap.context(() => {
       animateLettersOnScroll(containerRef);
     }, containerRef);
-
+ 
     return () => ctx.revert();
   }, []);
-
+ 
   return (
+
     <div
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden scroll-smooth bg-[#00102b]"
@@ -108,14 +113,14 @@ export const LetterCollision = forwardRef<HTMLDivElement>((_, forwardedRef) => {
           />
         ))}
       </div>
-
+ 
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-48"
         style={{
           background: "linear-gradient(to bottom, #00102b, rgba(0,16,43,0))",
         }}
       />
-
+ 
       <div className="relative ml-8 -mt-28 mb-36 flex h-screen flex-col justify-end lg:mb-24">
         <div className="flex flex-wrap p-0">
           <LetterDisplay word={welcome} />
