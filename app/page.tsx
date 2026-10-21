@@ -121,7 +121,7 @@ export default function Home() {
         </section>
 
         <section id="contact" className="h-screen">
-          <h1 className="text-6xl">Contact</h1>
+          <h1 className="text-6xl">Contact Us</h1>
         </section>
       </main>
 
